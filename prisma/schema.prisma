@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  INTERNAL
+  UMUM
+  ADMIN
+}
+
+enum StatusRuangan {
+  TERSEDIA
+  TIDAK_TERSEDIA
+}
+
+enum StatusPeminjaman {
+  PENGAJUAN
+  MENUNGGU_PEMBAYARAN
+  MENUNGGU_PERSETUJUAN
+  DISETUJUI
+  DITOLAK
+  SELESAI
+  DIBATALKAN
+}
+
+model user {
+  user_id       Int        @id @default(autoincrement())
+  nama          String     @db.VarChar(500)
+  email         String     @unique @db.VarChar(500)
+  nim           String?    @unique @db.VarChar(50)
+  nip           String?    @unique @db.VarChar(50)
+  nomor_telepon String?    @db.VarChar(500)
+  password      String     @db.VarChar(500)
+  user_type     String     @default("INTERNAL") @db.VarChar(50)
+  identitas     identitas? @relation()
+
+  peminjaman Peminjaman[]
+}
+
+model gedung {
+  gedung_id        Int      @id @default(autoincrement())
+  nama_gedung      String   @db.VarChar(500)
+  lokasi_gedung    String   @db.VarChar(500)
+  jam_buka         DateTime @db.Time(0)
+  jam_tutup        DateTime @db.Time(0)
+  fasilitas_gedung String   @db.VarChar(500)
+  gambar_gedung    String?  @db.VarChar(500)
+
+  ruangan    ruangan[]
+  peminjaman Peminjaman[]
+}
+
+model ruangan {
+  ruang_id            Int                 @id @default(autoincrement())
+  gedungId            Int
+  nama_ruangan        String              @db.VarChar(500)
+  lokasi_ruangan      String              @db.VarChar(500)
+  status_ruangan      StatusRuangan
+  kapasitas_ruangan   Int                 @db.Int
+  harga_ruangan       Int                 @default(0) @db.Int
+  gambar_ruangan      String?             @db.VarChar(500)
+
+  fasilitas           RuanganFasilitas[]
+  gedung              gedung              @relation(fields: [gedungId], references: [gedung_id])
+  peminjaman          Peminjaman[]
+}
+
+
+model Fasilitas {
+  fasilitas_id    Int     @id @default(autoincrement())
+  nama_fasilitas  String  @unique @db.VarChar(500)
+  harga_fasilitas Int     @db.Int
+  satuan          String? @db.VarChar(50)
+
+  // Relasi ke tabel penghubung
+  ruangan         RuanganFasilitas[]
+
+  @@map("fasilitas")
+}
+
+model RuanganFasilitas {
+  ruangan_id    Int
+  fasilitas_id  Int
+
+  ruangan       ruangan   @relation(fields: [ruangan_id], references: [ruang_id])
+  fasilitas     Fasilitas @relation(fields: [fasilitas_id], references: [fasilitas_id])
+
+  @@id([ruangan_id, fasilitas_id])
+  @@map("ruangan_fasilitas")
+}
+
+model identitas {
+  user_id       Int    @id @default(autoincrement())
+  catatan       String @db.VarChar(500)
+  user          user   @relation(fields: [user_id], references: [user_id])
+}
+
+model Peminjaman  {
+  peminjaman_id                Int               @id @default(autoincrement())
+  user_id                      Int
+  ruangan_id                   Int
+  gedung_id                    Int
+
+  tanggal_pemesanan            DateTime          @default(now())
+  tanggal_pinjam               DateTime
+  jam_mulai                    String            @db.VarChar(5)
+  jam_selesai                  String            @db.VarChar(5)
+  durasi                       Float
+
+  surat_izin_path              String?           @db.VarChar(1000)
+  catatan_tambahan             String?           @db.Text
+  fasilitas_tambahan_terpilih  Json?
+  total_harga                  Int               @default(0)
+  status_peminjaman            StatusPeminjaman  @default(PENGAJUAN)
+
+  user                         user              @relation(fields: [user_id], references: [user_id])
+  ruangan                      ruangan           @relation(fields: [ruangan_id], references: [ruang_id])
+  gedung                       gedung            @relation(fields: [gedung_id], references: [gedung_id])
+  
+  @@index([user_id])
+  @@index([ruangan_id])
+  @@index([gedung_id])
+}
