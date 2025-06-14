@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `user` MODIFY `nim` VARCHAR(50) NULL,
-    MODIFY `nip` VARCHAR(50) NULL;

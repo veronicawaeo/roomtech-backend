@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE `ruangan` ADD COLUMN `harga_ruangan` INTEGER NOT NULL DEFAULT 0;
-
--- AlterTable
-ALTER TABLE `user` ADD COLUMN `user_type` VARCHAR(50) NOT NULL DEFAULT 'INTERNAL';
