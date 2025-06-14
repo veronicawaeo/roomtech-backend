@@ -47,16 +47,19 @@ export class AuthService {
     );
    }
 
-   const parsedNimOrNip = parseInt(nimOrNipValue, 10);
-   if (isNaN(parsedNimOrNip)) {
-    throw new BadRequestException('NIM atau NIP harus berupa angka.');
-   }
-
-   if (nimOrNipValue.length >= 15) {
-    dataToCreate.nip = parsedNimOrNip.toString(); 
-   } else {
-    dataToCreate.nim = parsedNimOrNip.toString(); 
-   }
+    if (nimOrNipValue.length >= 15) {
+    if (nip !== undefined && nip !== null) {
+    dataToCreate.nip = nip.toString();
+    } else {
+    throw new BadRequestException('NIP wajib diisi untuk pendaftaran dengan NIP.');
+    }
+    } else {
+    if (nim !== undefined && nim !== null) {
+    dataToCreate.nim = nim.toString();
+    } else {
+    throw new BadRequestException('NIM wajib diisi untuk pendaftaran dengan NIM.');
+    }
+    }
   }
 
   try {
