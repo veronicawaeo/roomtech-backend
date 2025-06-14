@@ -34,7 +34,7 @@ enum StatusPeminjaman {
   DIBATALKAN
 }
 
-model user {
+model User {
   user_id       Int        @id @default(autoincrement())
   nama          String     @db.VarChar(500)
   email         String     @unique @db.VarChar(500)
@@ -43,12 +43,13 @@ model user {
   nomor_telepon String?    @db.VarChar(500)
   password      String     @db.VarChar(500)
   user_type     String     @default("INTERNAL") @db.VarChar(50)
-  identitas     identitas? @relation()
+  identitas     Identitas? @relation()
 
   peminjaman Peminjaman[]
+  @@map("user")
 }
 
-model gedung {
+model Gedung {
   gedung_id        Int      @id @default(autoincrement())
   nama_gedung      String   @db.VarChar(500)
   lokasi_gedung    String   @db.VarChar(500)
@@ -57,11 +58,12 @@ model gedung {
   fasilitas_gedung String   @db.VarChar(500)
   gambar_gedung    String?  @db.VarChar(500)
 
-  ruangan    ruangan[]
+  ruangan    Ruangan[]
   peminjaman Peminjaman[]
+  @@map("gedung")
 }
 
-model ruangan {
+model Ruangan {
   ruang_id            Int                 @id @default(autoincrement())
   gedungId            Int
   nama_ruangan        String              @db.VarChar(500)
@@ -72,8 +74,9 @@ model ruangan {
   gambar_ruangan      String?             @db.VarChar(500)
 
   fasilitas           RuanganFasilitas[]
-  gedung              gedung              @relation(fields: [gedungId], references: [gedung_id])
+  gedung              Gedung              @relation(fields: [gedungId], references: [gedung_id])
   peminjaman          Peminjaman[]
+  @@map("ruangan")
 }
 
 
@@ -93,17 +96,19 @@ model RuanganFasilitas {
   ruangan_id    Int
   fasilitas_id  Int
 
-  ruangan       ruangan   @relation(fields: [ruangan_id], references: [ruang_id])
+  ruangan       Ruangan   @relation(fields: [ruangan_id], references: [ruang_id])
   fasilitas     Fasilitas @relation(fields: [fasilitas_id], references: [fasilitas_id])
 
   @@id([ruangan_id, fasilitas_id])
   @@map("ruangan_fasilitas")
 }
 
-model identitas {
+model Identitas {
   user_id       Int    @id @default(autoincrement())
   catatan       String @db.VarChar(500)
-  user          user   @relation(fields: [user_id], references: [user_id])
+  user          User   @relation(fields: [user_id], references: [user_id])
+
+  @@map("identitas")
 }
 
 model Peminjaman  {
@@ -124,11 +129,12 @@ model Peminjaman  {
   total_harga                  Int               @default(0)
   status_peminjaman            StatusPeminjaman  @default(PENGAJUAN)
 
-  user                         user              @relation(fields: [user_id], references: [user_id])
-  ruangan                      ruangan           @relation(fields: [ruangan_id], references: [ruang_id])
-  gedung                       gedung            @relation(fields: [gedung_id], references: [gedung_id])
+  user                         User              @relation(fields: [user_id], references: [user_id])
+  ruangan                      Ruangan           @relation(fields: [ruangan_id], references: [ruang_id])
+  gedung                       Gedung            @relation(fields: [gedung_id], references: [gedung_id])
   
   @@index([user_id])
   @@index([ruangan_id])
   @@index([gedung_id])
+  @@map("peminjaman")
 }

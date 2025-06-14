@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePeminjamanDto } from './dto/create-peminjaman.dto';
-import { user } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -26,7 +26,7 @@ export class PeminjamanService {
 
   async createPeminjaman(
     dto: CreatePeminjamanDto,
-    currentUser: user & { user_type: string }, 
+    currentUser: User & { user_type: string }, 
     suratIzinFile?: Express.Multer.File,
   ) {
 

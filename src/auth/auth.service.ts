@@ -32,7 +32,7 @@ export class AuthService {
   const userType: UserType = isInternal ? 'INTERNAL' : 'UMUM';
 
   const hashedPassword = await bcyrpt.hash(password, 10);
-  const dataToCreate: Prisma.userCreateInput = {
+  const dataToCreate: Prisma.UserCreateInput = {
    nama,
    email,
    password: hashedPassword,
