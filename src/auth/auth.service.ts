@@ -40,27 +40,16 @@ export class AuthService {
   };
 
   if (userType === 'INTERNAL') {
-   const nimOrNipValue = nim || nip;
-   if (!nimOrNipValue) {
-    throw new BadRequestException(
-     'NIM atau NIP wajib diisi untuk pendaftaran UNSRAT.',
-    );
-   }
-
-    if (nimOrNipValue.length >= 15) {
-    if (nip !== undefined && nip !== null) {
-    dataToCreate.nip = nip.toString();
-    } else {
-    throw new BadRequestException('NIP wajib diisi untuk pendaftaran dengan NIP.');
+          if (nim) {
+            dataToCreate.nim = nim;
+          } else if (nip) {
+            dataToCreate.nip = nip;
+          } else {
+            throw new BadRequestException(
+              'NIM atau NIP wajib diisi untuk pendaftaran UNSRAT.',
+            );
+          }
     }
-    } else {
-    if (nim !== undefined && nim !== null) {
-    dataToCreate.nim = nim.toString();
-    } else {
-    throw new BadRequestException('NIM wajib diisi untuk pendaftaran dengan NIM.');
-    }
-    }
-  }
 
   try {
    const user = await this.prisma.user.create({
