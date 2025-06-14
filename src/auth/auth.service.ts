@@ -27,9 +27,14 @@ export class AuthService {
    throw new ConflictException('Email sudah terdaftar');
   }
 
-  const isInternal =
-   email.endsWith('@student.unsrat.ac.id') || email.endsWith('@unsrat.ac.id');
-  const userType: UserType = isInternal ? 'INTERNAL' : 'UMUM';
+  let userType: UserType;
+    if (email === 'admin@admin.com') {
+      userType = 'ADMIN';
+    } else {
+      const isInternal =
+        email.endsWith('@student.unsrat.ac.id') || email.endsWith('@unsrat.ac.id');
+      userType = isInternal ? 'INTERNAL' : 'UMUM';
+    }
 
   const hashedPassword = await bcyrpt.hash(password, 10);
   const dataToCreate: Prisma.UserCreateInput = {
