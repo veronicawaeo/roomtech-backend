@@ -18,6 +18,10 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       serveRoot: '/uploads',
       rootPath: join(__dirname, '..', 'uploads'), 
+      serveStaticOptions: {
+        index: false, 
+        redirect: false, 
+      },
     }),
 
     GedungModule, 
